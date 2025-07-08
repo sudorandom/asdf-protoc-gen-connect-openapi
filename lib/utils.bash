@@ -75,15 +75,8 @@ download_release() {
 
 	url="$GH_REPO/releases/download/v${version}/${release_filename}"
 
-	echo "* Downloading $TOOL_NAME release $version... to $filename"
-	echo "URL: $url" >&2
+	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
-	
-	if [ -f "$filename" ]; then
-		echo "Download successful: $filename" >&2
-	else
-		echo "Download failed: $filename not found" >&2
-	fi
 }
 
 install_version() {
@@ -105,7 +98,7 @@ install_version() {
 
 		mkdir -p "$install_path"
 		tar -xzf "$download_file" -C "$install_path" || fail "Could not extract $download_file"
-		
+
 		# Make the binary executable
 		chmod +x "$install_path/$TOOL_NAME"
 

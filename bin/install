@@ -16,9 +16,9 @@ arm64) arch="arm64" ;;
 esac
 
 if [ "$os" = "darwin" ]; then
-    platform="darwin_all"
+	platform="darwin_all"
 else
-    platform="${os}_${arch}"
+	platform="${os}_${arch}"
 fi
 
 # Download
