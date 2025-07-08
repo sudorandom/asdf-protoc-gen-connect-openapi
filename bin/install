@@ -21,14 +21,6 @@ else
 	platform="${os}_${arch}"
 fi
 
-# Download
-mkdir -p "$ASDF_DOWNLOAD_PATH"
-filename="${TOOL_NAME}_${ASDF_INSTALL_VERSION}_${platform}.tar.gz"
-url="$GH_REPO/releases/download/v${ASDF_INSTALL_VERSION}/${filename}"
-
-echo "* Downloading $TOOL_NAME release $ASDF_INSTALL_VERSION..."
-curl -fsSL -o "$ASDF_DOWNLOAD_PATH/$filename" "$url"
-
 # Install
 install_path="$(dirname "$ASDF_INSTALL_PATH")/bin"
 mkdir -p "$install_path"
