@@ -23,8 +23,6 @@ fi
 
 # Install
 install_path="$(dirname "$ASDF_INSTALL_PATH")/bin"
-mkdir -p "$install_path"
-tar -xzf "$ASDF_DOWNLOAD_PATH/$filename" -C "$install_path"
-chmod +x "$install_path/$TOOL_NAME"
+download_release "$ASDF_INSTALL_VERSION" "$release_file" "$install_path"
 
 echo "$TOOL_NAME $ASDF_INSTALL_VERSION installation was successful!"
