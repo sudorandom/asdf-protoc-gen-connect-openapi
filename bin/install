@@ -3,7 +3,12 @@
 set -euo pipefail
 
 TOOL_NAME="protoc-gen-connect-openapi"
-GH_REPO="https://github.com/sudorandom/protoc-gen-connect-openapi"
+
+current_script_path=${BASH_SOURCE[0]}
+plugin_dir=$(dirname "$(dirname "$current_script_path")")
+
+# shellcheck source=./lib/utils.bash
+source "${plugin_dir}/lib/utils.bash"
 
 # Determine platform
 os="$(uname -s | tr '[:upper:]' '[:lower:]')"
@@ -20,9 +25,6 @@ if [ "$os" = "darwin" ]; then
 else
 	platform="${os}_${arch}"
 fi
-
-# shellcheck source=./lib/utils.bash
-source "${plugin_dir}/lib/utils.bash"
 
 # Install
 install_path="$(dirname "$ASDF_INSTALL_PATH")/bin"
