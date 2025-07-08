@@ -21,6 +21,9 @@ else
 	platform="${os}_${arch}"
 fi
 
+# shellcheck source=./lib/utils.bash
+source "${plugin_dir}/lib/utils.bash"
+
 # Install
 install_path="$(dirname "$ASDF_INSTALL_PATH")/bin"
 install_version version "$ASDF_INSTALL_VERSION" "$install_path"
