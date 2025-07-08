@@ -23,6 +23,6 @@ fi
 
 # Install
 install_path="$(dirname "$ASDF_INSTALL_PATH")/bin"
-download_release "$ASDF_INSTALL_VERSION" "$release_file" "$install_path"
+install_version version "$ASDF_INSTALL_VERSION" "$install_path"
 
 echo "$TOOL_NAME $ASDF_INSTALL_VERSION installation was successful!"
