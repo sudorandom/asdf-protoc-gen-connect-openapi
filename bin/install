@@ -2,10 +2,37 @@
 
 set -euo pipefail
 
-current_script_path=${BASH_SOURCE[0]}
-plugin_dir=$(dirname "$(dirname "$current_script_path")")
+TOOL_NAME="protoc-gen-connect-openapi"
+GH_REPO="https://github.com/sudorandom/protoc-gen-connect-openapi"
 
-# shellcheck source=./lib/utils.bash
-source "${plugin_dir}/lib/utils.bash"
+# Determine platform
+os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+arch="$(uname -m)"
 
-install_version "$ASDF_INSTALL_TYPE" "$ASDF_INSTALL_VERSION" "$ASDF_INSTALL_PATH"
+case "$arch" in
+x86_64) arch="amd64" ;;
+aarch64) arch="arm64" ;;
+arm64) arch="arm64" ;;
+esac
+
+if [ "$os" = "darwin" ]; then
+    platform="darwin_all"
+else
+    platform="${os}_${arch}"
+fi
+
+# Download
+mkdir -p "$ASDF_DOWNLOAD_PATH"
+filename="${TOOL_NAME}_${ASDF_INSTALL_VERSION}_${platform}.tar.gz"
+url="$GH_REPO/releases/download/v${ASDF_INSTALL_VERSION}/${filename}"
+
+echo "* Downloading $TOOL_NAME release $ASDF_INSTALL_VERSION..."
+curl -fsSL -o "$ASDF_DOWNLOAD_PATH/$filename" "$url"
+
+# Install
+install_path="$(dirname "$ASDF_INSTALL_PATH")/bin"
+mkdir -p "$install_path"
+tar -xzf "$ASDF_DOWNLOAD_PATH/$filename" -C "$install_path"
+chmod +x "$install_path/$TOOL_NAME"
+
+echo "$TOOL_NAME $ASDF_INSTALL_VERSION installation was successful!"
