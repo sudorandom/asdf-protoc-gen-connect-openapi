@@ -2,7 +2,6 @@
 
 set -euo pipefail
 
-# TODO: Ensure this is the correct GitHub homepage where releases can be downloaded for protoc-gen-connect-openapi.
 GH_REPO="https://github.com/sudorandom/protoc-gen-connect-openapi"
 TOOL_NAME="protoc-gen-connect-openapi"
 TOOL_TEST="protoc-gen-connect-openapi --version"
@@ -36,13 +35,45 @@ list_all_versions() {
 	list_github_tags
 }
 
+get_platform_and_arch() {
+	local os arch
+	os="$(uname -s | tr '[:upper:]' '[:lower:]')"
+	arch="$(uname -m)"
+
+	# Remap architecture to the one used in release assets
+	case "$arch" in
+	x86_64) arch="amd64" ;;
+	aarch64) arch="arm64" ;;
+	arm64) arch="arm64" ;;
+	esac
+
+	# Darwin releases are universal
+	if [ "$os" = "darwin" ]; then
+		echo "darwin_all"
+		return
+	fi
+
+	# Handle Windows variants
+	if [[ "$os" == "cygwin"* || "$os" == "msys"* || "$os" == "mingw"* ]]; then
+		os="windows"
+	fi
+
+	# Check for supported combinations
+	if { [ "$os" = "linux" ] || [ "$os" = "windows" ]; } && { [ "$arch" = "amd64" ] || [ "$arch" = "arm64" ]; }; then
+		echo "${os}_${arch}"
+	else
+		fail "Unsupported OS-Arch combination: ${os}-${arch}"
+	fi
+}
+
 download_release() {
 	local version filename url
 	version="$1"
 	filename="$2"
+	local release_filename
+	release_filename=$(basename "$filename")
 
-	# TODO: Adapt the release URL convention for protoc-gen-connect-openapi
-	url="$GH_REPO/archive/v${version}.tar.gz"
+	url="$GH_REPO/releases/download/v${version}/${release_filename}"
 
 	echo "* Downloading $TOOL_NAME release $version..."
 	curl "${curl_opts[@]}" -o "$filename" -C - "$url" || fail "Could not download $url"
@@ -58,10 +89,16 @@ install_version() {
 	fi
 
 	(
-		mkdir -p "$install_path"
-		cp -r "$ASDF_DOWNLOAD_PATH"/* "$install_path"
+		# Find the downloaded file. There should be only one.
+		local download_file
+		download_file=$(find "$ASDF_DOWNLOAD_PATH" -type f -name "${TOOL_NAME}_${version}_*.tar.gz" | head -n 1)
+		if [ -z "$download_file" ]; then
+			fail "Could not find downloaded file for version $version in $ASDF_DOWNLOAD_PATH"
+		fi
 
-		# TODO: Assert protoc-gen-connect-openapi executable exists.
+		mkdir -p "$install_path"
+		tar -xzf "$download_file" -C "$install_path" || fail "Could not extract $download_file"
+
 		local tool_cmd
 		tool_cmd="$(echo "$TOOL_TEST" | cut -d' ' -f1)"
 		test -x "$install_path/$tool_cmd" || fail "Expected $install_path/$tool_cmd to be executable."
