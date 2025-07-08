@@ -22,8 +22,6 @@
 Plugin:
 
 ```shell
-asdf plugin add protoc-gen-connect-openapi
-# or
 asdf plugin add protoc-gen-connect-openapi https://github.com/sudorandom/asdf-protoc-gen-connect-openapi.git
 ```
 
